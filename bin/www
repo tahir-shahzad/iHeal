@@ -1,0 +1,218 @@
+#!/usr/bin/env node
+
+/**
+ * Module dependencies.
+ */
+
+connections = [];
+users = [];
+var app = require("../app").app;
+var router = require("../app").router;
+var debug = require("debug")("iheal:server");
+// var http = require('http');
+
+var server = require("http").Server(app);
+// var io = require("socket.io")(server);
+
+var io = require("socket.io")(server,{
+  transports : ['polling', 'websocket']
+});
+
+/**
+ * Get port from environment and store in Express.
+ */
+
+var port = normalizePort(process.env.PORT || "3001");
+app.set("port", port);
+
+/**
+ * Create HTTP server.
+ */
+
+// var server = http.createServer(app);
+
+/**
+ * Listen on provided port, on all network interfaces.
+ */
+io.sockets.on("connection", function (socket) {
+  console.log("client connect");
+  socket.on('new-message', (message) => {
+    console.log('data', message);
+    let data;
+    // data = JSON.stringify(message)
+    if(message){
+      console.log("message.receiverId")
+      console.log(message.receiverId)
+      createChat(JSON.parse(message));
+    }
+    console.log(message);
+    // we tell the client to execute 'new message'
+    socket.broadcast.emit('new-message', message);
+    console.log(message);
+
+  });
+  socket.on('status', (message) => {
+    console.log(message);
+    // we tell the client to execute 'new message'
+    socket.broadcast.emit('status', status);
+  });
+  socket.on('new user', function (data, callback) {
+    callback(true);
+    socket.username = data;
+    users.push(socket.username);
+    updateUsernames();
+  })
+  function updateUsernames() {
+    console.log('users', users, '...........');
+
+    io.sockets.emit('get user', users)
+  }
+});
+
+// -----------------------New Scoket Code--------------------------
+// io.sockets.on('connection', function (socket) {
+
+//     connections.push(socket);
+//   console.log('connected: %s socket connected', connections.length)
+
+//   // Disconnect the socket
+//   socket.on('disconnect', function (data) {
+//     users.splice(users.indexOf(socket.username), 1);
+//     updateUsernames();
+//     connections.splice(connections.indexOf(socket), 1)
+//     console.log('Disconnected: %s socket connected', connections.length)
+//   })
+//   socket.on('send Messages', function (data) {
+//     console.log('data...',data,'send data.');
+    
+//     // const { room, message } = data
+//     console.log('new data');
+//     console.log(data);
+//         if (data) {
+//       // this.room= socket.room;
+      
+//       createChat(data)
+//     }
+//     io.sockets.emit('new message', data )
+
+//   })
+
+//   // New User 
+//   socket.on('new user', function (data, callback) {
+//     console.log('data in js file', data);
+
+//     console.log(data);
+//     this.room = data.room
+//     callback(true);
+//     socket.username = data.username;
+//     socket.room = data.room
+//     users.push(socket.username);
+//     updateUsernames();
+//   })
+//   function updateUsernames() {
+//     console.log('users', users, '...........');
+
+//     io.sockets.emit('get user', users)
+//   }
+// });
+
+
+// -----------------------New Scoket Code--------------------------
+server.listen(port,(req,res)=>{
+  console.log(`server is listening on port ${port}`);
+  
+});
+
+// server.on("error", onError);
+// server.on("listening", onListening);
+
+app.get('/apis', /*VerifyToken,*/(req, res) => {
+  // console.log("here")
+   res.status(200).send({
+    message: 'Welcome to the iHeal API!',
+  })
+});
+//-------------------------Create chat in database--------------------
+const chat = require('../server/models').chat
+function createChat(data) {
+  let aa = data
+console.log('data from docket in function', aa);
+let to  = aa.receiverId;
+let from = aa.senderId;
+let text = aa.text;
+let room = aa.Room;
+console.log('data in chunks original', aa.receiverId, aa.senderId, aa.text, aa.Room);
+console.log('data in chunks', to, from, text, room);
+
+  chat.create({
+    senderId : from,
+    Room: room,
+    text: text,
+    receiverId : to
+  }).then(data => {
+    console.log('Chat Record added Successfully  in www');
+
+  })
+
+}
+
+//---------------------------------------------------------------------
+
+
+
+/**
+ * Normalize a port into a number, string, or false.
+ */
+
+function normalizePort(val) {
+  var port = parseInt(val, 10);
+
+  if (isNaN(port)) {
+    // named pipe
+    return val;
+  }
+
+  if (port >= 0) {
+    // port number
+    return port;
+  }
+
+  return false;
+}
+
+/**
+ * Event listener for HTTP server "error" event.
+ */
+
+function onError(error) {
+  if (error.syscall !== "listen") {
+    throw error;
+  }
+
+  var bind = typeof port === "string" ? "Pipe " + port : "Port " + port;
+
+  // handle specific listen errors with friendly messages
+  switch (error.code) {
+    case "EACCES":
+      console.error(bind + " requires elevated privileges");
+      process.exit(1);
+      break;
+    case "EADDRINUSE":
+      console.error(bind + " is already in use");
+      process.exit(1);
+      break;
+    default:
+      throw error;
+  }
+
+}
+
+/**
+ * Event listener for HTTP server "listening" event.
+ */
+
+function onListening() {
+  var addr = server.address();
+  var bind = typeof addr === "string" ? "pipe " + addr : "port " + addr.port;
+  debug("Listening on " + bind);
+}

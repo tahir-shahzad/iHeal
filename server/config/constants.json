@@ -1,0 +1,11 @@
+{
+ "development": 
+ {
+    "baseurl": "http://localhost:3000/"
+  },
+"test": 
+  {
+    "baseurl": "http://localhost:3000/"
+  }
+
+}

@@ -1,0 +1,27 @@
+{
+ "development": 
+ {
+  "username": "iheal_admin",
+  "password": "iHeal123",
+  "database": "iHeal",
+  "host": "iheal.cam0uc8qrktj.us-east-1.rds.amazonaws.com",
+  "dialect": "postgres"
+  },
+"test": 
+  {
+  "username": "iheal_admin",
+  "password": "iHeal123",
+  "database": "iHeal",
+  "host": "iheal.cam0uc8qrktj.us-east-1.rds.amazonaws.com",
+  "dialect": "postgres"
+  },
+"production": 
+  {
+  "username": "iheal_admin",
+  "password": "iHeal123",
+  "database": "iHeal",
+  "host": "iheal.cam0uc8qrktj.us-east-1.rds.amazonaws.com",
+  "dialect": "postgres"
+  }
+
+}
