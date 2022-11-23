@@ -37,7 +37,7 @@
     "request": "^2.83.0",
     "sequelize": "^4.27.0",
     "serve-favicon": "^2.4.5",
-    "socket.io": "^2.2.0",
+    "socket.io": "^2.5.0",
     "unique-filename": "^1.1.1",
     "uuid": "^3.3.2"
   },
