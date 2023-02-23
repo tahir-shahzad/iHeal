@@ -35,7 +35,7 @@
     "pg-promise": "^7.0.3",
     "rand-token": "^0.3.0",
     "request": "^2.83.0",
-    "sequelize": "^4.27.0",
+    "sequelize": "^6.28.2",
     "serve-favicon": "^2.4.5",
     "socket.io": "^2.2.0",
     "unique-filename": "^1.1.1",
